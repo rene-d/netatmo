@@ -43,7 +43,6 @@ Without any option, `config` only prints the current configuration.
 
     ./netatmo.py list
     
-    
 ### Fetch data into CSV files
 
     ./netatmo.py fetch
@@ -59,7 +58,6 @@ Without any option, `config` only prints the current configuration.
 Each option `-v` increases the verbosity. The option `-c` can be use to use an alternate configuration file.
 
 Both `-v` and `-c` have to be placed before the command.
-
 
 ## Usage as a Python module
 
@@ -80,7 +78,6 @@ Both `-v` and `-c` have to be placed before the command.
     ws.getData()
     print(ws.devices)
     
-    
 ## License and warranty
  
 None and none.
@@ -89,12 +86,15 @@ It is NOT an official software from Netatmo and is not endorsed or supported by 
 
 This library has been written as a personal work. Feel free to improve or adapt it to your own needs.
 
-
 ## Notes
 
 ### Installation on a Synology NAS
 
-Synology provides a Python 3 package that lacks the [requests]() module. Here is an simple download method, without git, pip or setup.py:
+Synology provides a Python 3 package that lacks the [requests](http://python-requests.org/) module. Here is an simple download method, without git, pip or setup.py:
 
     curl -sL https://api.github.com/repos/kennethreitz/requests/tarball/v2.12.1 | tar -xzf - --strip-components=1 --wildcards '*/requests'
     
+### Other Netatmo devices
+
+This library has been tested only with the weather station and its interior module. I don't know if it works well with the windgauge or the pluviometer. Other devices are unsupported, but their methods could be easily added. See [Netatmo Connect APIs](https://dev.netatmo.com/dev/resources/technical/reference).
+
