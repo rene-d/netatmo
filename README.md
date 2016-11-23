@@ -20,13 +20,13 @@ Although Netatmo provides [samples](https://dev.netatmo.com/dev/resources/techni
     ./netatmo.py -h
     ./netatmo.py {command} -h
     
-where `{command}` could be one of these keywords: `config`, `fetch`, `list`, `test`, `dump`.
+where `{command}` can be one of these keywords: `config`, `fetch`, `list`, `test`, `dump`.
     
 ### Credentials
 
 The library reads the username/password and client id/secret from a .rc file. By default, it is ~/.netatmorc. It could be edited by hand, or written by the library with the `config` command.
 
-    ./netatmo.py config -u user@mail -p password -i client_id -s client_secret -d 70:ee:50:XX:XX:XX
+    ./netatmo.py config -u user@mail -p password -i client_id -s client_secret -d 70:ee:50:xx:xx:xx
     
 Without any option, `config` only prints the current configuration. 
 
@@ -36,7 +36,7 @@ Without any option, `config` only prints the current configuration.
     password: password
     client_id: 1234567890abcdef12345678
     client_secret: ABCdefg123456hijklmn7890pqrs
-    default_station: 70:ee:50:XX:XX:XX
+    default_station: 70:ee:50:xx:xx:xx
     $
 
 ### Display the authorized stations
@@ -47,11 +47,11 @@ Without any option, `config` only prints the current configuration.
 
     ./netatmo.py fetch
     
- This command will write two CSV files, `netatmo_station.csv` and `netatmo_module.csv`. The most recent measures are appended to these files depending on the last timestamps.
+This command will write two CSV files, `netatmo_station.csv` and `netatmo_module.csv`. The most recent measures are appended to these files depending on the last timestamps.
  
 ### Other commands and options
  
- `test` tests the connection. On success, exit code is zero. On failure, non zero, like any shell commands.
+`test` tests the connection. On success, exit code is zero. On failure, non zero, like any shell command.
 
 `dump` displays more data from the weather station.
 
@@ -82,19 +82,19 @@ Both `-v` and `-c` have to be placed before the command.
  
 None and none.
 
-It is NOT an official software from Netatmo and is not endorsed or supported by this company.
+It is NOT an official software from Netatmo and it is not endorsed or supported by this company.
 
 This library has been written as a personal work. Feel free to improve or adapt it to your own needs.
 
 ## Notes
+
+### Other Netatmo devices
+
+This library has been tested only with the weather station and its interior module. I don't know if it works well with the windgauge or the pluviometer. Other devices are unsupported, but their methods could be easily added. See [Netatmo Connect APIs](https://dev.netatmo.com/dev/resources/technical/reference).
 
 ### Installation on a Synology NAS
 
 Synology provides a Python 3 package that lacks the [requests](http://python-requests.org/) module. Here is an simple download method, without git, pip or setup.py:
 
     curl -sL https://api.github.com/repos/kennethreitz/requests/tarball/v2.12.1 | tar -xzf - --strip-components=1 --wildcards '*/requests'
-    
-### Other Netatmo devices
-
-This library has been tested only with the weather station and its interior module. I don't know if it works well with the windgauge or the pluviometer. Other devices are unsupported, but their methods could be easily added. See [Netatmo Connect APIs](https://dev.netatmo.com/dev/resources/technical/reference).
 
