@@ -75,7 +75,7 @@ Both `-v` and `-c` have to be placed before the command.
            'username': 'user@mail',
            'password': 'password',
            'default_station': '70:ee:50:XX:XX:XX' } )
-    ws.getData()
+    ws.get_data()
     print(ws.devices)
     
 ## License and warranty
