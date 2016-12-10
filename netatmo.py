@@ -22,7 +22,7 @@ import csv
 import pprint
 import requests
 
-verbosity = 0
+VERBOSITY = 0
 
 DEFAULT_RC_FILE = "~/.netatmorc"
 
@@ -61,17 +61,16 @@ class Colors:
     LightCyan    = '\033[1;36m'
     White        = '\033[1;37m'
 
-trace_output = sys.stdout
-
-if not trace_output.isatty():
+if not sys.stdout.isatty():
     for _ in dir(Colors):
-        if not _.startswith('__'): setattr(Colors, _, '')
+        if not _.startswith('__'):
+            setattr(Colors, _, '')
 
 def trace(level, *args, pretty=False):
-    """ print a colorized message when stdoud is a terminal """
-    if verbosity >= level:
+    """ print a colorized message when stdout is a terminal """
+    if level <= VERBOSITY:
         pretty = pprint.pformat if pretty else str
-        cc = {
+        color_codes = {
             -2: Colors.LightRed,
             -1: Colors.LightYellow,
             0: '',
@@ -79,16 +78,17 @@ def trace(level, *args, pretty=False):
             2: Colors.Yellow,
             3: Colors.Red
         }
-        color = cc.get(level, '')
-        trace_output.write(color)
-        for i, v in enumerate(args):
-            if i != 0: trace_output.write(' ')
-            trace_output.write(pretty(v))
-        trace_output.write(Colors.Reset)
-        trace_output.write('\n')
+        color = color_codes.get(level, '')
+        sys.stdout.write(color)
+        for i, arg in enumerate(args):
+            if i != 0:
+                sys.stdout.write(' ')
+            sys.stdout.write(pretty(arg))
+        sys.stdout.write(Colors.Reset)
+        sys.stdout.write('\n')
 
 
-def _post_request(url, params):
+def post_request(url, params):
     """
         wrapper to the GET request
 
@@ -97,11 +97,11 @@ def _post_request(url, params):
     """
     trace(1, ">>>> " + url)
     trace(2, params, pretty=True)
-    if verbosity >= 1:
-        t = time.time()
+    if VERBOSITY >= 1:
+        start_time = time.time()
     resp = requests.post(url, data=params)
-    if verbosity >= 1:
-        trace(1, "<<<< %d bytes in %.3f s" % (len(resp.content), time.time() - t))
+    if VERBOSITY >= 1:
+        trace(1, "<<<< %d bytes in %.3f s" % (len(resp.content), time.time() - start_time))
     ret = json.loads(resp.text)
     trace(2, ret, pretty=True)
     return ret
@@ -118,7 +118,7 @@ class WeatherStation:
         self._expiration = None
 
         self.auth(None, None, None, None)
-        self.default_station = None
+        self.default_device_id = None
         self.user = None
         self.devices = None
         self.rc_file = None
@@ -126,7 +126,7 @@ class WeatherStation:
         if isinstance(configuration, dict):
             _ = configuration
             self.auth(_['client_id'], _['client_secret'], _['username'], _['password'])
-            self.default_station = _['device'] if 'device' in _ else None
+            self.default_device_id = _['device'] if 'device' in _ else None
         elif isinstance(configuration, str):
             self.rc_file = configuration
         elif configuration is None:
@@ -150,7 +150,8 @@ class WeatherStation:
         """
             load credentials from the configuration file
         """
-        if self.rc_file is None: return
+        if self.rc_file is None:
+            return
         config = configparser.ConfigParser()
         rc = os.path.expanduser(self.rc_file)
         if os.path.exists(rc):
@@ -161,8 +162,8 @@ class WeatherStation:
                       config['netatmo']['client_secret'],
                       config['netatmo']['username'],
                       config['netatmo']['password'])
-            if config.has_option('netatmo', 'default_station'):
-                self.default_station = config['netatmo']['default_station']
+            if config.has_option('netatmo', 'default_device_id'):
+                self.default_device_id = config['netatmo']['default_device_id']
         except:
             self.auth(None, None, None, None)
 
@@ -170,7 +171,8 @@ class WeatherStation:
         """
             save credentials to the configuration file
         """
-        if self.rc_file is None: return
+        if self.rc_file is None:
+            return
         config = configparser.ConfigParser()
         rc = os.path.expanduser(self.rc_file)
         if os.path.exists(rc):
@@ -181,30 +183,31 @@ class WeatherStation:
         config['netatmo']['client_secret'] = str(self.client_secret)
         config['netatmo']['username'] = str(self.username)
         config['netatmo']['password'] = str(self.password)
-        if self.default_station is None:
-            config.remove_option('netatmo', 'default_station')
+        if self.default_device_id is None:
+            config.remove_option('netatmo', 'default_device_id')
         else:
-            config['netatmo']['default_station'] = self.default_station
+            config['netatmo']['default_device_id'] = self.default_device_id
         config.remove_section('netatmo/tokens')
-        with open(rc, "w") as f:
-            config.write(f)
+        with open(rc, "w") as file_handle:
+            config.write(file_handle)
             trace(1, "save credentials to", rc)
 
     def load_tokens(self):
         """
             load the tokens from the configuration file
         """
-        if self.rc_file is None: return
+        if self.rc_file is None:
+            return
         config = configparser.ConfigParser()
         rc = os.path.expanduser(self.rc_file)
         if os.path.exists(rc):
             config.read(rc)
             trace(1, "load tokens from", rc)
         try:
-            c = config['netatmo/tokens']
-            self._access_token = c['access_token']
-            self._refresh_token = c['refresh_token']
-            self._expiration = datetime.datetime.strptime(c['expiration'], "%Y-%m-%dT%H:%M:%S").timestamp()
+            tokens = config['netatmo/tokens']
+            self._access_token = tokens['access_token']
+            self._refresh_token = tokens['refresh_token']
+            self._expiration = datetime.datetime.strptime(tokens['expiration'], "%Y-%m-%dT%H:%M:%S").timestamp()
         except:
             self._access_token = None
 
@@ -212,7 +215,8 @@ class WeatherStation:
         """
             save the tokens to the configuration file
         """
-        if self.rc_file is None: return
+        if self.rc_file is None:
+            return
         config = configparser.ConfigParser()
         rc = os.path.expanduser(self.rc_file)
         if os.path.exists(rc):
@@ -222,8 +226,8 @@ class WeatherStation:
             'refresh_token': self._refresh_token,
             'expiration': datetime.datetime.fromtimestamp(int(self._expiration)).isoformat()
         }
-        with open(rc, "w") as f:
-            config.write(f)
+        with open(rc, "w") as file_handle:
+            config.write(file_handle)
             trace(1, "save tokens to", rc)
 
     @property
@@ -248,8 +252,9 @@ class WeatherStation:
                 "password": self.password,
                 "scope": "read_station"
             }
-            resp = _post_request(_AUTH_REQ, post_params)
-            if resp is None: return False
+            resp = post_request(_AUTH_REQ, post_params)
+            if resp is None:
+                return False
             if 'error' in resp:
                 print("error", resp['error'], _AUTH_REQ)
                 return None
@@ -270,8 +275,9 @@ class WeatherStation:
                 "client_id": self.client_id,
                 "client_secret": self.client_secret
             }
-            resp = _post_request(_AUTH_REQ, post_params)
-            if resp is None: return False
+            resp = post_request(_AUTH_REQ, post_params)
+            if resp is None:
+                return False
             if 'error' in resp:
                 print("error", resp['error'], _AUTH_REQ)
                 return None
@@ -290,20 +296,22 @@ class WeatherStation:
 
     def get_data(self, device_id=None):
         """
-            retrieve data from netatmo server
+            retrieve data from netatmo server for one or all devices
         """
         auth_token = self.access_token
-        if auth_token is None: return False
+        if auth_token is None:
+            return False
 
         post_params = {"access_token": auth_token, "get_favorites": False}
 
         if device_id is None:
-            post_params["device_id"] = self.default_station
+            post_params["device_id"] = self.default_device_id
         elif device_id != '*':
             post_params["device_id"] = device_id
 
-        resp = _post_request(_GETSTATIONSDATA_REQ, post_params)
-        if resp is None: return False
+        resp = post_request(_GETSTATIONSDATA_REQ, post_params)
+        if resp is None:
+            return False
         if 'error' in resp:
             print("error", resp['error'], _GETSTATIONSDATA_REQ)
             return False
@@ -320,49 +328,59 @@ class WeatherStation:
 
     def set_default_station(self, device):
         """
-            set the default station by its MAC or name (requires connection)
+            set the default station by its MAC address or name (requires connection in this case)
         """
         if device == '':
-            self.default_station = None
+            self.default_device_id = None
             return True
 
-        # if we give a MAC address, do not search the station by its name
+        # if we have a MAC address, do not search the station by its name
         if bool(re.match('^' + r'[\:\-]'.join(['([0-9a-f]{2})']*6) + '$', device.lower())):
-            self.default_station = device.lower()
+            self.default_device_id = device.lower()
             return True
 
         self.get_data('*')
-        i = self.station_by_name(device)
-        if i:
-            self.default_station = i['_id']
+        station = self.station_by_name(device)
+        if station:
+            self.default_device_id = station['_id']
             return True
         else:
             return False
 
-    def station_by_name(self, station=None):
+    def station_by_name(self, station_name=None):
         """
             return a station by its name or MAC if parameter is not None
             the default or the first is parameter is None
         """
-        if self.devices is None: return None
-        if not station: station = self.default_station
-        for i in self.devices:
-            if station == '' or station is None: return i
-            if i['station_name'] == station: return i
-            if i['_id'].lower() == station.lower(): return i
+        if self.devices is None:
+            return None
+        if not station_name:
+            station_name = self.default_device_id
+        for device in self.devices:
+            if station_name == '' or station_name is None:
+                return device
+            if device['station_name'] == station_name:
+                return device
+            if device['_id'].lower() == station_name.lower():
+                return device
         return None
 
-    def module_by_name(self, module, station=None):
+    def module_by_name(self, module, station_name=None):
         """
             return a module by its name or MAC
         """
-        s = self.station_by_name(station)
-        if s is None: return None
-        if s['module_name'] == module: return s
-        if s['_id'] == module: return s
-        for mod in s['modules']:
-            if mod['module_name'] == module: return mod
-            if mod['_id'] == module: return mod
+        station = self.station_by_name(station_name)
+        if station is None:
+            return None
+        if station['module_name'] == module:
+            return station
+        if station['_id'] == module:
+            return station
+        for mod in station['modules']:
+            if mod['module_name'] == module:
+                return mod
+            if mod['_id'] == module:
+                return mod
         return None
 
     def get_measure(self, device_id=None, scale='max', mtype='*', module_id=None,
@@ -382,14 +400,16 @@ class WeatherStation:
             real_time         no
         """
         auth_token = self.access_token
-        if auth_token is None: return
+        if auth_token is None:
+            return
         post_params = {"access_token": auth_token}
 
         if device_id is None:
             device_id = self.station_by_name()['_id']
 
         post_params['device_id'] = device_id
-        if module_id: post_params['module_id'] = module_id
+        if module_id:
+            post_params['module_id'] = module_id
         post_params['scale'] = scale
 
         if mtype == '*':
@@ -400,12 +420,15 @@ class WeatherStation:
             mtype = ','.join(mtype)
 
         post_params['type'] = mtype
-        if date_begin: post_params['date_begin'] = date_begin
-        if date_end: post_params['date_end'] = date_end
-        if limit: post_params['limit'] = limit
+        if date_begin:
+            post_params['date_begin'] = date_begin
+        if date_end:
+            post_params['date_end'] = date_end
+        if limit:
+            post_params['limit'] = limit
         post_params['optimize'] = "true" if optimize else "false"
         post_params['real_time'] = "true" if real_time else "false"
-        return _post_request(_GETMEASURE_REQ, post_params)
+        return post_request(_GETMEASURE_REQ, post_params)
 
 
 def last_timestamp(filename):
@@ -414,15 +437,16 @@ def last_timestamp(filename):
     """
     if not os.path.exists(filename):
         return 0
-    with open(filename, "rb") as f:
-        f.seek(0, os.SEEK_END)
-        taille = min(f.tell(), 100)
+    with open(filename, "rb") as file_handle:
+        file_handle.seek(0, os.SEEK_END)
+        taille = min(file_handle.tell(), 100)
         if taille != 0:
-            f.seek(-taille, os.SEEK_END)
-            last = f.readlines()[-1].decode('ascii')
-            t = last[0:last.find(';')]
-            if t.isnumeric():
-                return int(t)
+            file_handle.seek(-taille, os.SEEK_END)
+            last = file_handle.readlines()[-1].decode('ascii')
+            # timestamp is the first field
+            timestamp = last[0:last.find(';')]
+            if timestamp.isnumeric():
+                return int(timestamp)
     return 0
 
 
@@ -432,7 +456,8 @@ def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
     """
 
     start = last_timestamp(csv_file)
-    if start > 0: start += 1
+    if start > 0:
+        start += 1
 
     csv_file = open(csv_file, "a")
     csv_writer = csv.writer(csv_file, delimiter=';', quotechar='"',
@@ -447,23 +472,24 @@ def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
         n += 1
         print("getmeasure {} date_begin={} {}".format(n, start, time.ctime(start)))
 
-        v = ws.get_measure(device_id, "max", ','.join(fields), module_id, date_begin=start)
+        measures = ws.get_measure(device_id, "max", ','.join(fields), module_id, date_begin=start)
 
-        if not 'status' in v or v['status'] != 'ok':
-            print("error", v)
+        if not 'status' in measures or measures['status'] != 'ok':
+            print("error", measures)
             break
 
-        if len(v['body']) == 0:
-            #print("the end", v)
+        if len(measures['body']) == 0:
+            #print("the end", measures)
             break
 
-        for _, (t, v) in enumerate(sorted(v['body'].items())):
-            t = int(t)
-            values = [t, datetime.datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")]
-            values += v
+        for _, (timestamp, value) in enumerate(sorted(measures['body'].items())):
+            timestamp = int(timestamp)
+            values = [timestamp, datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")]
+            values += value
             #print("{:2} {}".format(_, values))
             csv_writer.writerow(values)
-            if start < t: start = t
+            if start < timestamp:
+                start = timestamp
 
         if start >= date_end:
             #print("last measure")
@@ -481,22 +507,23 @@ def fetch(rc_file_or_dict=None):
         rc_file the configuration file
     """
     ws = WeatherStation(rc_file_or_dict)
-    if not ws.get_data(): return
-    s = ws.station_by_name()
-    m = s['modules'][0]
-    print("station_name : {}".format(s['station_name']))
-    print("device_id    : {}".format(s['_id']))
-    print("module_name  : {}".format(s['module_name']))
-    print("data_type    : {}".format(s['data_type']))
-    print("module_id    : {}".format(m['_id']))
-    print("module_name  : {}".format(m['module_name']))
-    print("data_type    : {}".format(m['data_type']))
+    if not ws.get_data():
+        return
+    station = ws.station_by_name()
+    module = station['modules'][0]
+    print("station_name : {}".format(station['station_name']))
+    print("device_id    : {}".format(station['_id']))
+    print("module_name  : {}".format(station['module_name']))
+    print("data_type    : {}".format(station['data_type']))
+    print("module_id    : {}".format(module['_id']))
+    print("module_name  : {}".format(module['module_name']))
+    print("data_type    : {}".format(module['data_type']))
 
     data_type = ['Temperature', 'CO2', 'Humidity', 'Noise', 'Pressure']
-    dl_csv(ws, "netatmo_station.csv", s['_id'], None, data_type, s['dashboard_data']['time_utc'])
+    dl_csv(ws, "netatmo_station.csv", station['_id'], None, data_type, station['dashboard_data']['time_utc'])
 
     data_type = ['Temperature', 'Humidity']
-    dl_csv(ws, "netatmo_module.csv", s['_id'], m['_id'], data_type, m['dashboard_data']['time_utc'])
+    dl_csv(ws, "netatmo_module.csv", station['_id'], module['_id'], data_type, module['dashboard_data']['time_utc'])
 
 
 def self_test(args):
@@ -513,11 +540,11 @@ def self_test(args):
     exit(0 if ok else 1)
 
 
-def fmtdate(t):
+def fmtdate(timestamp):
     """
         return the date to human readable format
     """
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(t)))
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(timestamp)))
 
 
 def dump(args):
@@ -525,7 +552,8 @@ def dump(args):
         dump various data from the station
     """
     ws = WeatherStation(args.rc_file)
-    if not ws.get_data('*'): return
+    if not ws.get_data('*'):
+        return
 
     def dump1(values, is_module):
         """ utility print function """
@@ -539,7 +567,8 @@ def dump(args):
             "NAMain": "Main device"
         }
 
-        if values is None: return
+        if values is None:
+            return
         try:
             print("module %s - %s" % (values['module_name'], device_types.get(values['type'], values['type'])))
             print("%20s : %s" % ('_id', values['_id']))
@@ -566,42 +595,44 @@ def dump(args):
             pprint.pprint(values)
             raise
 
-    s = ws.station_by_name(args.device)
+    station = ws.station_by_name(args.device)
 
-    if s is None: return
+    if station is None:
+        return
 
     #TODO
     #print("user %s" % (ws.user['mail']))
     #pprint.pprint(ws.user)
 
-    print("station %s" % (s['station_name']))
-    print("%20s : %s - %s" % ('date_setup', s['date_setup'], fmtdate(s['date_setup'])))
-    print("%20s : %s - %s" % ('last_setup', s['last_setup'], fmtdate(s['last_setup'])))
-    print("%20s : %s - %s" % ('last_upgrade', s['last_upgrade'], fmtdate(s['last_upgrade'])))
-    print("%20s : %s %s / alt %s" % ('place', s['place']['city'], s['place']['country'], s['place']['altitude']))
-    print("%20s : %s" % ('wifi_status', s['wifi_status']))
-    print("%20s : %s - %s" % ('last_status_store', s['last_status_store'], fmtdate(s['last_status_store'])))
+    print("station %s" % (station['station_name']))
+    print("%20s : %s - %s" % ('date_setup', station['date_setup'], fmtdate(station['date_setup'])))
+    print("%20s : %s - %s" % ('last_setup', station['last_setup'], fmtdate(station['last_setup'])))
+    print("%20s : %s - %s" % ('last_upgrade', station['last_upgrade'], fmtdate(station['last_upgrade'])))
+    print("%20s : %s %s / alt %s" % ('place', station['place']['city'], station['place']['country'],
+                                     station['place']['altitude']))
+    print("%20s : %s" % ('wifi_status', station['wifi_status']))
+    print("%20s : %s - %s" % ('last_status_store', station['last_status_store'], fmtdate(station['last_status_store'])))
 
-    dump1(s, False) # dumps the main module / the weatherstation
-    for mod in s['modules']:
+    dump1(station, False) # dumps the main module / the weatherstation
+    for mod in station['modules']:
         dump1(mod, True) # dumps an attached module
 
-    def dump2(name, v):
+    def dump2(name, measures):
         """ utility print function """
         print("module", name)
-        if not 'status' in v or v['status'] != 'ok':
-            print(v)
+        if not 'status' in measures or measures['status'] != 'ok':
+            print(measures)
         else:
-            for i, (t, v) in enumerate(sorted(v['body'].items())):
-                print("{:2} {} {} {}".format(i, t, fmtdate(t), v))
+            for i, (timestamp, values) in enumerate(sorted(measures['body'].items())):
+                print("{:2} {} {} {}".format(i, timestamp, fmtdate(timestamp), values))
 
     half_hour = int(time.time()) - 1800
 
-    measure = ws.get_measure(date_begin=half_hour, device_id=s['_id'])
-    dump2(s['module_name'], measure)
-    for mod in s['modules']:
-        measure = ws.get_measure(date_begin=half_hour, device_id=s['_id'], module_id=mod['_id'])
-        dump2(mod['module_name'], measure)
+    measures = ws.get_measure(date_begin=half_hour, device_id=station['_id'])
+    dump2(station['module_name'], measures)
+    for mod in station['modules']:
+        measures = ws.get_measure(date_begin=half_hour, device_id=station['_id'], module_id=mod['_id'])
+        dump2(mod['module_name'], measures)
 
 
 def list_stations(args):
@@ -610,10 +641,11 @@ def list_stations(args):
     """
     ws = WeatherStation(args.rc_file)
     ws.get_data('*')
-    for i, d in enumerate(ws.devices):
-        print(i + 1, "station", d['_id'], d['station_name'], d['place']['city'], d['place']['country'])
-        for _, m in enumerate([d] + d['modules']):
-            print("   module", m['_id'], m['module_name'], ','.join(m['data_type']))
+    for i, device in enumerate(ws.devices):
+        print(i + 1, "station", device['_id'], device['station_name'],
+              device['place']['city'], device['place']['country'])
+        for _, module in enumerate([device] + device['modules']):
+            print("   module", module['_id'], module['module_name'], ','.join(module['data_type']))
 
 
 def action_config(parser, args):
@@ -648,11 +680,11 @@ def action_config(parser, args):
         print("Read config")
 
     ws.load_credentials()
-    print("username:", ws.username)
+    print("username: %(username)s" % ws)
     print("password:", ws.password)
     print("client_id:", ws.client_id)
     print("client_secret:", ws.client_secret)
-    print("default_station:", ws.default_station)
+    print("default_device_id:", ws.default_device_id)
 
 
 class HelpFormatter40(argparse.HelpFormatter):
@@ -667,12 +699,12 @@ def main():
     """
         main function
     """
-    global verbosity
+    global VERBOSITY
 
     parser = argparse.ArgumentParser(description='netatmo Python3 library',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("-v", "--verbose", help="increase verbosity level", action="count", default=verbosity)
+    parser.add_argument("-v", "--verbose", help="increase VERBOSITY level", action="count", default=VERBOSITY)
     parser.add_argument("-c", "--rc-file", help="configuration file", default=DEFAULT_RC_FILE, metavar="RC")
 
     subparsers = parser.add_subparsers(help='sub-commands', dest='action')
@@ -700,7 +732,7 @@ def main():
     args = parser.parse_args()
 
     # set the verbose level as a global variable
-    verbosity = args.verbose
+    VERBOSITY = args.verbose
 
     trace(1, str(args))
 

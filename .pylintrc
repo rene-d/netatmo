@@ -1,0 +1,23 @@
+[MASTER]
+
+# Pickle collected data for later comparisons.
+persistent=yes
+
+# Use multiple processes to speed up Pylint.
+jobs=4
+
+[MESSAGES CONTROL]
+
+disable=bad-whitespace
+
+
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=i,j,k,ex,Run,_,ok,rc,n,ws
+
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=120
