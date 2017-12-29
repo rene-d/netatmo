@@ -680,7 +680,7 @@ def action_config(parser, args):
         print("Read config")
 
     ws.load_credentials()
-    print("username: %(username)s" % ws)
+    print("username:", ws.username)
     print("password:", ws.password)
     print("client_id:", ws.client_id)
     print("client_secret:", ws.client_secret)
