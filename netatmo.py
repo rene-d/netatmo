@@ -522,8 +522,11 @@ def fetch(rc_file_or_dict=None):
     data_type = ['Temperature', 'CO2', 'Humidity', 'Noise', 'Pressure']
     dl_csv(ws, "netatmo_station.csv", station['_id'], None, data_type, station['dashboard_data']['time_utc'])
 
-    data_type = ['Temperature', 'Humidity']
-    dl_csv(ws, "netatmo_module.csv", station['_id'], module['_id'], data_type, module['dashboard_data']['time_utc'])
+    try:
+        data_type = ['Temperature', 'Humidity']
+        dl_csv(ws, "netatmo_module.csv", station['_id'], module['_id'], data_type, module['dashboard_data']['time_utc'])
+    except KeyError:
+        pass
 
 
 def self_test(args):
