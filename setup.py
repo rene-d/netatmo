@@ -11,11 +11,11 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="netatmo",
-    version="0.0.2",
+    version="0.0.3",
     description="Python3 API for the Netatmo Weather Station",
     long_description=long_description,
-    long_description_content_type="text/markdown",  # Optional (see note above)
-    url="https://github.com/rene-d/netatmo",  # Optional
+    long_description_content_type="text/markdown",
+    url="https://github.com/rene-d/netatmo",
     author="Rene Devichi",
     author_email="rene.github@gmail.com",
     classifiers=[
@@ -25,7 +25,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    keywords="development domotics netatmo",
+    keywords="development automation netatmo",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.5, <4",

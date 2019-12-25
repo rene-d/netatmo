@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
-
-# rene, november 2016
+# rene, 2016-2019
 
 """
     Python API for Netatmo Weather Station
