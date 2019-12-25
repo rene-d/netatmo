@@ -1,6 +1,6 @@
 # netatmo.py
 
-[![Build Status](https://travis-ci.org/rene-d/netatmo.svg?branch=develop)](https://travis-ci.org/rene-d/netatmo)
+[![Build Status](https://travis-ci.org/rene-d/netatmo.svg?branch=master)](https://travis-ci.org/rene-d/netatmo)
 [![pyi](https://img.shields.io/pypi/v/netatmo.svg)](https://pypi.python.org/pypi/netatmo)
 [![pyi](https://img.shields.io/pypi/pyversions/netatmo.svg)](https://pypi.python.org/pypi/netatmo)
 

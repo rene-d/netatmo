@@ -11,7 +11,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="netatmo",
-    version="0.0.3",
+    version="1.0.0",
     description="Python3 API for the Netatmo Weather Station",
     long_description=long_description,
     long_description_content_type="text/markdown",
