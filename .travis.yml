@@ -1,0 +1,19 @@
+language: python
+python:
+- 3.5
+- 3.6
+- 3.7
+install:
+- pip install -r requirements.txt
+- python setup.py install
+deploy:
+  provider: pypi
+  user: __token__
+  password:
+    secure: rwynPraYTTnSvhwm0ZE72Tw+ZU3KbV8JYu8UmeDMlrasHCwvzQlUp0luMmF13sro1iDVTTA3dbUbbFrD/T5N6xKov3xDm5uaTtXdAZ0Rw6F2OGc9PaQAJxAl1P7KivzMFjqGIvrm/WTFsXDyL5XFj4DMMw8QArfibYleXH5ZCMmomxoBcjU8vowskcaXDGBpzss46LAasbVvCWIxu/PLJGhq2kZHBatr2GXxAnj8Gu0/zIkeTAlN2OuqPYSP3cHjk8ia2MXlDlmj4uC3B277uMetccAJAWuJVsbWQJ6rIMS1UI0h0RYYsVJrk6fH/oaA3E7uORZzfI+p8mUwVcg5osFkhX+A5loYZzmmektDvkrybMK/ynPNXUqGNQVl+UdkPyt76TO8ZzHvFCMA07lIxCpzK+sqOpK/9Ww8m6s9azY2BrfhtaKqvzeWRkXrhsxxA8wao1dxFybfOju9vuPdQ5LW7EJ23EpqDCJlEsBaDrFUyWZKK39vufNt32FF9fbFwLEureh/C3/hZiBJ0IOc8phJb2uPz1VPVb8yRYHCKFPGdfnOJ3aIpAB27Sj8iJlFrZplc2ucScSKBYMa7mdrUVkvj/Du5tHrM3lCa4eXpH7JE4WBUsYTT4eEVQzCOVvk7vw//P2p/edVGRhmrKT1mYAxrwcut+g8DsmqjjAfiKo=
+  distributions: sdist bdist_wheel bdist_egg
+  skip_existing: true
+  on:
+    tags: true
+script:
+- echo "Done"
