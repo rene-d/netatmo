@@ -19,6 +19,8 @@ import json
 import csv
 import pprint
 import requests
+import pkg_resources
+
 
 VERBOSITY = 0
 
@@ -822,6 +824,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
+    parser.add_argument("--version", help="show version", action="store_true")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -866,6 +869,10 @@ def main():
     sp2.add_argument("-d", "--device", help="device id or station name", required=False)
 
     args = parser.parse_args()
+
+    if args.version:
+        print(pkg_resources.require("netatmo")[0])
+        exit(0)
 
     # set the verbose level as a global variable
     VERBOSITY = args.verbose

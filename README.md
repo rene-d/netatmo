@@ -17,8 +17,8 @@ Although Netatmo provides [samples](https://dev.netatmo.com/dev/resources/techni
 
 ### Help
     
-    ./netatmo.py -h
-    ./netatmo.py {command} -h
+    netatmo -h
+    netatmo {command} -h
     
 where `{command}` can be one of these keywords: `config`, `fetch`, `list`, `test`, `dump`.
     
@@ -26,11 +26,11 @@ where `{command}` can be one of these keywords: `config`, `fetch`, `list`, `test
 
 The library reads the username/password and client id/secret from a .rc file. By default, it is ~/.netatmorc. It could be edited by hand, or written by the library with the `config` command.
 
-    ./netatmo.py config -u user@mail -p password -i client_id -s client_secret -d 70:ee:50:xx:xx:xx
+    netatmo config -u user@mail -p password -i client_id -s client_secret -d 70:ee:50:xx:xx:xx
     
 Without any option, `config` only prints the current configuration. 
 
-    $ ./netatmo.py config
+    $ netatmo config
     Read config
     username: user@mail
     password: password
@@ -41,11 +41,11 @@ Without any option, `config` only prints the current configuration.
 
 ### Display the authorized stations
 
-    ./netatmo.py list
+    netatmo list
     
 ### Fetch data into CSV files
 
-    ./netatmo.py fetch
+    netatmo fetch
     
 This command will write two CSV files, `netatmo_station.csv` and `netatmo_module.csv`. The most recent measures are appended to these files depending on the last timestamps.
  

@@ -14,8 +14,8 @@ setup(
     version="0.0.2",
     description="Python3 API for the Netatmo Weather Station",
     long_description=long_description,
-    long_description_content_type='text/markdown',  # Optional (see note above)
-    url='https://github.com/rene-d/netatmo',  # Optional
+    long_description_content_type="text/markdown",  # Optional (see note above)
+    url="https://github.com/rene-d/netatmo",  # Optional
     author="Rene Devichi",
     author_email="rene.github@gmail.com",
     classifiers=[
