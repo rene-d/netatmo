@@ -19,7 +19,7 @@ setup(
     author="Rene Devichi",
     author_email="rene.github@gmail.com",
     classifiers=[
-        "License :: OSI Approved :: The Unlicense",
+        "License :: Public Domain",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
