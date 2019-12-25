@@ -15,5 +15,6 @@ deploy:
   skip_existing: true
   on:
     tags: true
+    branch: develop
 script:
 - echo "Done"
