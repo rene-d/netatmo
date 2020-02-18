@@ -35,8 +35,8 @@ _GETMEASURE_REQ = _BASE_URL + "api/getmeasure"
 
 class Colors:
     """
-        ANSI SGR codes
-        https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+    ANSI SGR codes
+    https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
     """
 
     Reset = "\033[0m"  # Reset / Normal
@@ -93,31 +93,24 @@ def trace(level, *args, pretty=False):
 
 def post_request(url, params):
     """
-        wrapper to the GET request
-
-        url
-        params
+    wrapper to the GET request
     """
     trace(1, ">>>> " + url)
     trace(2, params, pretty=True)
-    if VERBOSITY >= 1:
-        start_time = time.time()
+    start_time = time.time()
     resp = requests.post(url, data=params)
-    if VERBOSITY >= 1:
-        trace(
-            1, "<<<< %d bytes in %.3f s" % (len(resp.content), time.time() - start_time)
-        )
-    ret = json.loads(resp.text)
+    trace(1, "<<<< %d bytes in %.3f s" % (len(resp.content), time.time() - start_time))
+    ret = json.loads(resp.content)
     trace(2, ret, pretty=True)
     return ret
 
 
 class WeatherStation:
     """
-        class to access data
+    class to access data
     """
 
-    def __init__(self, configuration):
+    def __init__(self, configuration=None):
         self._access_token = None
         self._refresh_token = None
         self._expiration = None
@@ -132,8 +125,10 @@ class WeatherStation:
             _ = configuration
             self.auth(_["client_id"], _["client_secret"], _["username"], _["password"])
             self.default_device_id = _["device"] if "device" in _ else None
+
         elif isinstance(configuration, str):
             self.rc_file = configuration
+
         elif configuration is None:
             self.rc_file = DEFAULT_RC_FILE
 
@@ -143,7 +138,7 @@ class WeatherStation:
 
     def auth(self, client_id, client_secret, username, password):
         """
-            set credentials
+        set credentials
         """
         self.client_id = client_id
         self.client_secret = client_secret
@@ -153,7 +148,7 @@ class WeatherStation:
 
     def load_credentials(self):
         """
-            load credentials from the configuration file
+        load credentials from the configuration file
         """
         if self.rc_file is None:
             return
@@ -176,7 +171,7 @@ class WeatherStation:
 
     def save_credentials(self):
         """
-            save credentials to the configuration file
+        save credentials to the configuration file
         """
         if self.rc_file is None:
             return
@@ -201,7 +196,7 @@ class WeatherStation:
 
     def load_tokens(self):
         """
-            load the tokens from the configuration file
+        load the tokens from the configuration file
         """
         if self.rc_file is None:
             return
@@ -222,7 +217,7 @@ class WeatherStation:
 
     def save_tokens(self):
         """
-            save the tokens to the configuration file
+        save the tokens to the configuration file
         """
         if self.rc_file is None:
             return
@@ -244,7 +239,7 @@ class WeatherStation:
     @property
     def access_token(self):
         """
-            refresh if necessary and return the access_token
+        refresh if necessary and return the access_token
         """
         if self.client_id is None or self.client_secret is None:
             return None
@@ -306,7 +301,7 @@ class WeatherStation:
 
     def get_data(self, device_id=None):
         """
-            retrieve data from netatmo server for one or all devices
+        retrieve data from netatmo server for one or all devices
         """
         auth_token = self.access_token
         if auth_token is None:
@@ -314,9 +309,9 @@ class WeatherStation:
 
         post_params = {"access_token": auth_token, "get_favorites": False}
 
-        if device_id is None:
+        if device_id is None or device_id == "*":
             post_params["device_id"] = self.default_device_id
-        elif device_id != "*":
+        else:
             post_params["device_id"] = device_id
 
         resp = post_request(_GETSTATIONSDATA_REQ, post_params)
@@ -337,7 +332,7 @@ class WeatherStation:
 
     def set_default_station(self, device):
         """
-            set the default station by its MAC address or name (requires connection in this case)
+        set the default station by its MAC address or name (requires connection in this case)
         """
         if device == "":
             self.default_device_id = None
@@ -360,8 +355,8 @@ class WeatherStation:
 
     def station_by_name(self, station_name=None):
         """
-            return a station by its name or MAC if parameter is not None
-            the default or the first is parameter is None
+        return a station by its name or MAC if parameter is not None
+        the default or the first is parameter is None
         """
         if self.devices is None:
             return None
@@ -378,7 +373,7 @@ class WeatherStation:
 
     def module_by_name(self, module, station_name=None):
         """
-            return a module by its name or MAC
+        return a module by its name or MAC
         """
         station = self.station_by_name(station_name)
         if station is None:
@@ -407,18 +402,18 @@ class WeatherStation:
         real_time=False,
     ):
         """
-            https://dev.netatmo.com/dev/resources/technical/reference/common/getmeasure
-            Name              Required
-            access_token      yes
-            device_id         yes         70:ee:50:09:f0:xx
-            module_id         yes         70:ee:50:09:f0:xx
-            scale             yes         max
-            type              yes         Temperature,Humidity
-            date_begin        no          1459265427
-            date_end          no          1459265487
-            limit             no
-            optimize          no
-            real_time         no
+        https://dev.netatmo.com/dev/resources/technical/reference/common/getmeasure
+        Name              Required
+        access_token      yes
+        device_id         yes         70:ee:50:09:f0:xx
+        module_id         yes         70:ee:50:09:f0:xx
+        scale             yes         max
+        type              yes         Temperature,Humidity
+        date_begin        no          1459265427
+        date_end          no          1459265487
+        limit             no
+        optimize          no
+        real_time         no
         """
         auth_token = self.access_token
         if auth_token is None:
@@ -454,7 +449,7 @@ class WeatherStation:
 
 def last_timestamp(filename):
     """
-        find the most recent timestamp in a csv File
+    find the most recent timestamp in a csv File
     """
     if not os.path.exists(filename):
         return 0
@@ -473,7 +468,7 @@ def last_timestamp(filename):
 
 def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
     """
-        download measures from a module (or the main module of a station) to a csv file
+    download measures from a module (or the main module of a station) to a csv file
     """
 
     start = last_timestamp(csv_file)
@@ -502,12 +497,11 @@ def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
             device_id, "max", ",".join(fields), module_id, date_begin=start
         )
 
-        if not "status" in measures or measures["status"] != "ok":
+        if "status" not in measures or measures["status"] != "ok":
             print("error", measures)
             break
 
         if len(measures["body"]) == 0:
-            # print("the end", measures)
             break
 
         for _, (timestamp, value) in enumerate(sorted(measures["body"].items())):
@@ -519,13 +513,12 @@ def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
                 ),
             ]
             values += value
-            # print("{:2} {}".format(_, values))
+
             csv_writer.writerow(values)
             if start < timestamp:
                 start = timestamp
 
         if start >= date_end:
-            # print("last measure")
             break
 
         start += 1
@@ -535,9 +528,9 @@ def dl_csv(ws, csv_file, device_id, module_id, fields, date_end=None):
 
 def fetch(rc_file_or_dict=None):
     """
-        retrieve measures from station and append them to csv files
+    retrieve measures from station and append them to csv files
 
-        rc_file the configuration file
+    rc_file the configuration file
     """
     ws = WeatherStation(rc_file_or_dict)
     if not ws.get_data():
@@ -578,7 +571,7 @@ def fetch(rc_file_or_dict=None):
 
 def self_test(args):
     """
-        check the connection
+    check the connection
     """
     ws = WeatherStation(args.rc_file)
     ok = ws.get_data()
@@ -592,14 +585,14 @@ def self_test(args):
 
 def fmtdate(timestamp):
     """
-        return the date to human readable format
+    return the date to human readable format
     """
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(timestamp)))
 
 
 def dump(args):
     """
-        dump various data from the station
+    dump various data from the station
     """
     ws = WeatherStation(args.rc_file)
     if not ws.get_data("*"):
@@ -619,6 +612,7 @@ def dump(args):
 
         if values is None:
             return
+
         try:
             print(
                 "module %s - %s"
@@ -629,6 +623,7 @@ def dump(args):
             )
             print("%20s : %s" % ("_id", values["_id"]))
             print("%20s : %s" % ("data_type", values["data_type"]))
+
             if is_module:
                 print(
                     "%20s : %s - %s"
@@ -719,7 +714,7 @@ def dump(args):
     def dump2(name, measures):
         """ utility print function """
         print("module", name)
-        if not "status" in measures or measures["status"] != "ok":
+        if "status" not in measures or measures["status"] != "ok":
             print(measures)
         else:
             for i, (timestamp, values) in enumerate(sorted(measures["body"].items())):
@@ -738,7 +733,7 @@ def dump(args):
 
 def list_stations(args):
     """
-        list all stations
+    list all stations
     """
     ws = WeatherStation(args.rc_file)
     ws.get_data("*")
@@ -760,34 +755,34 @@ def list_stations(args):
             )
 
 
-def action_config(parser, args):
+def action_config(args):
     """
-        write or read the configuration file
+    write or read the configuration file
 
-        parser the argparse.ArgumentParser object
-        args the dict with command-line parameters
+    parser the argparse.ArgumentParser object
+    args the dict with command-line parameters
     """
     ws = WeatherStation(args.rc_file)
 
     n = 0
-    if not args.username is None:
+    if args.username is not None:
         n += 1
-    if not args.password is None:
+    if args.password is not None:
         n += 1
-    if not args.client_id is None:
+    if args.client_id is not None:
         n += 1
-    if not args.client_secret is None:
+    if args.client_secret is not None:
         n += 1
 
     if n >= 1 and n < 4:
-        parser.print_help()
+        args.parser.print_help()
         exit(2)
 
-    elif n == 4 or not args.device is None:
+    elif n == 4 or args.device is not None:
         ws.load_credentials()
         if n == 4:
             ws.auth(args.client_id, args.client_secret, args.username, args.password)
-        if not args.device is None:
+        if args.device is not None:
             ws.set_default_station(args.device)
         ws.save_credentials()
 
@@ -805,7 +800,7 @@ def action_config(parser, args):
 
 class HelpFormatter40(argparse.HelpFormatter):
     """
-        a help formatter for long options
+    a help formatter for long options
     """
 
     def __init__(self, prog, indent_increment=2, max_help_position=24, width=None):
@@ -814,7 +809,7 @@ class HelpFormatter40(argparse.HelpFormatter):
 
 def main():
     """
-        main function
+    main function
     """
     global VERBOSITY
 
@@ -841,11 +836,14 @@ def main():
 
     subparsers = parser.add_subparsers(help="sub-commands", dest="action")
 
-    sp1 = subparsers.add_parser(
+    # action "config"
+    sp = subparsers.add_parser(
         "config", help="Set or show the credentials", formatter_class=HelpFormatter40
     )
+    sp.set_defaults(parser=sp)
+    sp.set_defaults(func=action_config)
 
-    group1 = sp1.add_argument_group("Options to set credentials")
+    group1 = sp.add_argument_group("Options to set credentials")
     group1.add_argument("-u", "--username", help="User address email", required=False)
     group1.add_argument("-p", "--password", help="User password", required=False)
     group1.add_argument("-i", "--client-id", help="Your app client_id", metavar="ID")
@@ -853,19 +851,29 @@ def main():
         "-s", "--client-secret", help="Your app client_secret", metavar="SECRET"
     )
 
-    group2 = sp1.add_argument_group("Option to set the default device")
+    group2 = sp.add_argument_group("Option to set the default device")
     group2.add_argument(
         "-d", "--device", help="device id or station name", required=False
     )
 
-    subparsers.add_parser("fetch", help="fetch last measures into csv files")
+    # action "fetch"
+    sp = subparsers.add_parser("fetch", help="fetch last measures into csv files")
+    sp.set_defaults(func=lambda args: fetch(args.rc_file))
 
-    subparsers.add_parser("list", help="list waether stations")
+    # action "list"
+    subparsers.add_parser("list", help="list waether stations").set_defaults(
+        func=list_stations
+    )
 
-    subparsers.add_parser("test", help="test the connection")
+    # action "test"
+    subparsers.add_parser("test", help="test the connection").set_defaults(
+        func=self_test
+    )
 
-    sp2 = subparsers.add_parser("dump", help="get and display some measures")
-    sp2.add_argument("-d", "--device", help="device id or station name", required=False)
+    # action "dummp"
+    sp = subparsers.add_parser("dump", help="get and display some measures")
+    sp.add_argument("-d", "--device", help="device id or station name", required=False)
+    sp.set_defaults(func=dump)
 
     args = parser.parse_args()
 
@@ -878,16 +886,8 @@ def main():
 
     trace(1, str(args))
 
-    if args.action == "config":
-        action_config(sp1, args)
-    elif args.action == "list":
-        list_stations(args)
-    elif args.action == "fetch":
-        fetch(args.rc_file)
-    elif args.action == "dump":
-        dump(args)
-    elif args.action == "test":
-        self_test(args)
+    if hasattr(args, "func"):
+        args.func(args)
     else:
         parser.print_help()
 

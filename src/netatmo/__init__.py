@@ -1,1 +1,1 @@
-from netatmo import *
+from .netatmo import *

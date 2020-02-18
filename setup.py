@@ -11,7 +11,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="netatmo",
-    version="1.0.0",
+    version="1.0.1",
     description="Python3 API for the Netatmo Weather Station",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -28,7 +28,7 @@ setup(
     keywords="development automation netatmo",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    python_requires=">=3.5, <4",
+    python_requires=">=3.5",
     install_requires=["requests"],
     entry_points={"console_scripts": ["netatmo=netatmo.netatmo:main"]},
     project_urls={
