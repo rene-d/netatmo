@@ -680,14 +680,20 @@ def dump(args):
         "%20s : %s - %s"
         % ("date_setup", station["date_setup"], fmtdate(station["date_setup"]))
     )
-    print(
-        "%20s : %s - %s"
-        % ("last_setup", station["last_setup"], fmtdate(station["last_setup"]))
-    )
-    print(
-        "%20s : %s - %s"
-        % ("last_upgrade", station["last_upgrade"], fmtdate(station["last_upgrade"]))
-    )
+    if "last_setup" in station:
+        print(
+            "%20s : %s - %s"
+            % ("last_setup", station["last_setup"], fmtdate(station["last_setup"]))
+        )
+    if "last_upgrade" in station:
+        print(
+            "%20s : %s - %s"
+            % (
+                "last_upgrade",
+                station["last_upgrade"],
+                fmtdate(station["last_upgrade"]),
+            )
+        )
     print(
         "%20s : %s %s / alt %s"
         % (
