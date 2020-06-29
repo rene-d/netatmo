@@ -661,7 +661,8 @@ def dump(args):
                     print("%20s > %s" % (sensor, value))
 
             for sensor in sorted(values["data_type"]):
-                print("%20s = %s" % (sensor, values["dashboard_data"][sensor]))
+                if sensor in values["dashboard_data"]:
+                    print("%20s = %s" % (sensor, values["dashboard_data"][sensor]))
         except:
             pprint.pprint(values)
             raise
