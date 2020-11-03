@@ -31,7 +31,7 @@ Finally, you may get the [netatmo.py](https://github.com/rene-d/netatmo/blob/mas
 * Python 3 (sorry if you live in [legacy](https://wiki.python.org/moin/Python2orPython3))
 * The [requests](http://docs.python-requests.org/) module (should be included in any decent Python distribution)
 * A valid Netatmo account with at least one weather station
-* A client\_id / client\_secret pair from Netatmo developper program (see [Create your app](https://dev.netatmo.com/dev/createanapp))
+* A client\_id / client\_secret pair from Netatmo developper program (see [Create your app](https://dev.netatmo.com/apps/createanapp))
 
 ## Command-line usage
 
