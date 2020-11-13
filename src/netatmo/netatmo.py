@@ -190,7 +190,10 @@ class WeatherStation:
         else:
             config["netatmo"]["default_device_id"] = self.default_device_id
         config.remove_section("netatmo/tokens")
-        os.umask(0o077)
+        try:
+            os.umask(0o077)
+        except:
+            pas
         with open(rc, "w") as file_handle:
             config.write(file_handle)
             trace(1, "save credentials to", rc)
