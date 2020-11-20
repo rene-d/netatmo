@@ -98,7 +98,7 @@ ws = netatmo.WeatherStation( {
         'client_secret': 'ABCdefg123456hijklmn7890pqrs',
         'username': 'user@mail',
         'password': 'password',
-        'default_station': '70:ee:50:XX:XX:XX' } )
+        'device': '70:ee:50:XX:XX:XX' } )
 ws.get_data()
 print(ws.devices)
 ```
