@@ -6,7 +6,6 @@
 
     inspired by https://github.com/philippelt/netatmo-api-python
 """
-
 import sys
 import os
 import time
@@ -571,6 +570,30 @@ def fetch(rc_file_or_dict=None):
         )
     except KeyError:
         pass
+
+    n_module = len(station["modules"])
+    if n_module > 1:
+        for i in range(1, n_module):
+            module = station["modules"][i]
+            print("station_name : {}".format(station["station_name"]))
+            print("device_id    : {}".format(station["_id"]))
+            print("module_name  : {}".format(station["module_name"]))
+            print("data_type    : {}".format(station["data_type"]))
+            print("module_id    : {}".format(module["_id"]))
+            print("module_name  : {}".format(module["module_name"]))
+            print("data_type    : {}".format(module["data_type"]))
+            try:
+                data_type = ["Temperature", "CO2", "Humidity"]
+                dl_csv(
+                    ws,
+                    f"netatmo_module_in_{i}.csv",
+                    station["_id"],
+                    module["_id"],
+                    data_type,
+                    module["dashboard_data"]["time_utc"],
+                )
+            except KeyError:
+                pass
 
 
 def self_test(args):
