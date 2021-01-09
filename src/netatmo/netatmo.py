@@ -6,6 +6,7 @@
 
     inspired by https://github.com/philippelt/netatmo-api-python
 """
+
 import sys
 import os
 import time
