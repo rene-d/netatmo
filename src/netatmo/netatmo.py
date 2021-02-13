@@ -193,7 +193,7 @@ class WeatherStation:
         try:
             os.umask(0o077)
         except:
-            pas
+            pass
         with open(rc, "w") as file_handle:
             config.write(file_handle)
             trace(1, "save credentials to", rc)
