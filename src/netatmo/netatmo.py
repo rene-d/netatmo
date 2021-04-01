@@ -367,6 +367,8 @@ class WeatherStation:
         if not station_name:
             station_name = self.default_device_id
         for device in self.devices:
+            if "module_name" not in device:
+                device["module_name"] = "noname"
             if station_name == "" or station_name is None:
                 return device
             if device["station_name"] == station_name:
@@ -387,6 +389,8 @@ class WeatherStation:
         if station["_id"] == module:
             return station
         for mod in station["modules"]:
+            if "module_name" not in mod:
+                mod["module_name"] = "noname"
             if mod["module_name"] == module:
                 return mod
             if mod["_id"] == module:
