@@ -70,7 +70,7 @@ if not sys.stdout.isatty():
 
 
 def trace(level, *args, pretty=False):
-    """ print a colorized message when stdout is a terminal """
+    """print a colorized message when stdout is a terminal"""
     if level <= VERBOSITY:
         pretty = pprint.pformat if pretty else str
         color_codes = {
@@ -631,7 +631,7 @@ def dump(args):
         return
 
     def dump1(values, is_module):
-        """ utility print function """
+        """utility print function"""
 
         # from Netatmo-API-PHP/Examples/Utils.php
         device_types = {
@@ -751,7 +751,7 @@ def dump(args):
         dump1(mod, True)  # dumps an attached module
 
     def dump2(name, measures):
-        """ utility print function """
+        """utility print function"""
         print("module", name)
         if "status" not in measures or measures["status"] != "ok":
             print(measures)
