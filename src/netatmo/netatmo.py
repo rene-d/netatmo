@@ -776,6 +776,8 @@ def list_stations(args):
     """
     ws = WeatherStation(args.rc_file)
     ws.get_data("*")
+    if not ws.devices:
+        return
     for i, device in enumerate(ws.devices):
         print(
             i + 1,
