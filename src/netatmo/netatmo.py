@@ -580,12 +580,13 @@ def fetch(rc_file_or_dict=None):
     if n_module > 1:
         for i in range(1, n_module):
             module = station["modules"][i]
+            mod_name = module.get("module_name", module["data_type"][0])
             print("station_name : {}".format(station["station_name"]))
             print("device_id    : {}".format(station["_id"]))
             print("module_name  : {}".format(station["module_name"]))
             print("data_type    : {}".format(station["data_type"]))
             print("module_id    : {}".format(module["_id"]))
-            print("module_name  : {}".format(module["module_name"]))
+            print("module_name  : {}".format(mod_name))
             print("data_type    : {}".format(module["data_type"]))
             try:
                 data_type = ["Temperature", "CO2", "Humidity"]
@@ -646,10 +647,11 @@ def dump(args):
             return
 
         try:
+            mod_name = values.get("module_name", values["data_type"][0])
             print(
                 "module %s - %s"
                 % (
-                    values["module_name"],
+                    mod_name,
                     device_types.get(values["type"], values["type"]),
                 )
             )
@@ -683,17 +685,18 @@ def dump(args):
                     "%20s : %s - %s"
                     % ("last_seen", values["last_seen"], fmtdate(values["last_setup"]))
                 )
-
-            for sensor, value in sorted(values["dashboard_data"].items()):
-                if sensor in values["data_type"]:
-                    continue
-                if sensor.startswith("date_") or sensor.startswith("time_"):
-                    print("%20s > %s - %s" % (sensor, value, fmtdate(value)))
-                else:
-                    print("%20s > %s" % (sensor, value))
+            
+            if("dashboard_data" in values):
+                for sensor, value in sorted(values["dashboard_data"].items()):
+                    if sensor in values["data_type"]:
+                        continue
+                    if sensor.startswith("date_") or sensor.startswith("time_"):
+                        print("%20s > %s - %s" % (sensor, value, fmtdate(value)))
+                    else:
+                        print("%20s > %s" % (sensor, value))
 
             for sensor in sorted(values["data_type"]):
-                if sensor in values["dashboard_data"]:
+                if "dashboard_data" in values and sensor in values["dashboard_data"]:
                     print("%20s = %s" % (sensor, values["dashboard_data"][sensor]))
         except:
             pprint.pprint(values)
@@ -776,8 +779,6 @@ def list_stations(args):
     """
     ws = WeatherStation(args.rc_file)
     ws.get_data("*")
-    if not ws.devices:
-        return
     for i, device in enumerate(ws.devices):
         print(
             i + 1,
@@ -788,10 +789,12 @@ def list_stations(args):
             device["place"]["country"],
         )
         for _, module in enumerate([device] + device["modules"]):
+            mod_name = module.get("module_name", module["data_type"][0])
+
             print(
                 "   module",
                 module["_id"],
-                module["module_name"],
+                mod_name,
                 ",".join(module["data_type"]),
             )
 
