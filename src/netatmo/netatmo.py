@@ -600,6 +600,18 @@ def fetch(rc_file_or_dict=None):
                 )
             except KeyError:
                 pass
+            try:
+                data_type = ["Rain"]
+                dl_csv(
+                    ws,
+                    f"netatmo_module_rain.csv",
+                    station["_id"],
+                    module["_id"],
+                    data_type,
+                    module["dashboard_data"]["time_utc"],
+                )
+            except KeyError:
+                pass
 
 
 def self_test(args):
