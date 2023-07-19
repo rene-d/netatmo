@@ -1,5 +1,12 @@
 # netatmo.py
 
+**Important**: due to changes made by Netatmo to authentication, this project is no longer functional and will not be updated. 
+
+Please fork it and update it, or use another library, like [netatmo-api-python](https://github.com/philippelt/netatmo-api-python).
+
+*Original README follows...*
+
+
 [![Build Status](https://travis-ci.org/rene-d/netatmo.svg?branch=master)](https://travis-ci.org/rene-d/netatmo)
 [![pyi](https://img.shields.io/pypi/v/netatmo.svg)](https://pypi.python.org/pypi/netatmo)
 [![pyi](https://img.shields.io/pypi/pyversions/netatmo.svg)](https://pypi.python.org/pypi/netatmo)
